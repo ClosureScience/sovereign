@@ -17,6 +17,60 @@
 - name: Create database user for ownCloud
   postgresql_user: login_host=localhost login_user={{ db_admin_username }} login_password="{{ db_admin_password }}" name={{ owncloud_db_username }} password="{{ owncloud_db_password }}" role_attr_flags=CREATEDB state=present
 
+###################################
+## nexcloud in place of owncloud
+
+# - name: install required packages for nextcloud
+#   apt: pkg={{ item }} state=latest update_cache=yes
+#   with_items:
+#     - php7.0-gmp
+#     - php7.0-curl
+#     - php7.0-gd
+#     - php-imagick
+#     - php7.0-intl
+#     - php7.0-json
+#     - php7.0-mcrypt
+#     - php7.0-sqlite3
+#     - php7.0-mbstring
+#     - php7.0-xml
+#     - php7.0-zip
+
+# - name: download nextcloud zip
+#   get_url:
+#     url=https://download.nextcloud.com/server/releases/nextcloud-{{ nextcloud_version }}.zip
+#     dest=/root/nextcloud-{{ nextcloud_version }}.zip
+
+# - name: extract nextcloud zip
+#   unarchive: src=/root/nextcloud-{{ nextcloud_version }}.zip dest=/var/www/owncloud copy=no owner=www-data group=www-data
+
+
+# - name: set nextcloud files ownership to root:www-data
+#   file: path=/var/www/owncloud state=directory owner=root group=www-data recurse=yes
+
+# - name: ensure files are mode 0640 and directories mode 0750
+#   shell: find /var/www/owncloud -type {{ item.type }} -print0 | xargs -0 chmod -c {{ item.mode }}
+#   register: chmod_result
+#   changed_when: "chmod_result.stdout != \"\""
+#   with_items:
+#     - { type: 'f', mode: '0640' }
+#     - { type: 'd', mode: '0750' }
+
+# - name: give nextcloud write access to required directories
+#   file: path=/var/www/owncloud/{{ item }} state=directory owner=www-data group=www-data recurse=yes
+#   with_items:
+#     - apps/
+#     - config/
+#     - data/
+#     - theme/
+#     - updater/
+#     - assets/
+
+# - name: set execute permission for occ command line tool
+#   file: path=/var/www/owncloud/occ state=file mode=0750
+
+
+#####################################################
+
 - name: Ensure repository key for ownCloud is in place
   apt_key: url=https://download.owncloud.org/download/repositories/stable/Debian_8.0/Release.key state=present
   tags:
@@ -34,6 +88,7 @@
 
 - name: Ensure ownCloud directory is in place
   file: state=directory path=/var/www/owncloud
+
 
 - name: Move ownCloud data to encrypted filesystem
   command: mv /var/www/owncloud/data /decrypted/owncloud-data creates=/decrypted/owncloud-data

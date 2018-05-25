@@ -1,4 +1,8 @@
+group_vars/sovereign
 .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory
 .vagrant/machines
 tests.pyc
 secret
+
+## python
+*.pyc
